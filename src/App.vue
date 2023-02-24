@@ -41,7 +41,10 @@
 		}
 	}
 </script>
-
+<style lang="scss">
+	/* 注意要写在第一行，同时给style标签加入lang="scss"属性 */
+	@import "@/uni_modules/uview-ui/index.scss";
+</style>
 <style>
 	/* 头条小程序需要把 iconfont 样式放到组件外 */
 	@import "components/m-icon/m-icon.css";
@@ -101,7 +104,7 @@
 		flex: 1;
 		flex-direction: column;
 		background-color: #efeff4;
-		padding: 10px;
+		/* padding: 10px; */
 	}
 
 	.input-group {

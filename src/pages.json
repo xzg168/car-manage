@@ -1,9 +1,13 @@
 {
+	"easycom": {
+		// "autoscan": true
+	},
 	"pages": [ //pages数组中第一项表示应用启动页,
 		{
 			"path": "pages/main/main",
 			"style": {
-				"navigationBarTitleText": "登录模板"
+				"navigationBarTitleText": "登录模板",
+				"navigationStyle": "custom"
 			}
 		}, {
 			"path": "pages/login/login",

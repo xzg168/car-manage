@@ -1,22 +1,18 @@
 <template>
 	<view class="content">
-		<view v-if="hasLogin" class="hello">
+		<view class="topNav" :style="{'backgroundImage':`url(${urlTobase64('new','bg_t','jpg')})`}">
 			<view class="title">
-				您好 {{userName}}，您已成功登录。
-			</view>
-			<view class="ul">
-				<view>这是 uni-app 带登录模板的示例App首页。</view>
-				<view>在 “我的” 中点击 “退出” 可以 “注销当前账户”</view>
+				智慧出行
 			</view>
 		</view>
-		<view v-if="!hasLogin" class="hello">
-			<view class="title">
-				您好 游客。
-			</view>
-			<view class="ul">
-				<view>这是 uni-app 带登录模板的示例App首页。</view>
-				<view>在 “我的” 中点击 “登录” 可以 “登录您的账户”</view>
-			</view>
+		<view class="navContianer">
+			<u-grid :border="true" col="3" @click="click">
+				<u-grid-item v-for="(listItem,listIndex) in list" :key="listIndex">
+					<u-icon :customStyle="{paddingTop:20+'rpx'}" :name="listItem.name" :size="30"></u-icon>
+					<text class="grid-text">{{listItem.title}}</text>
+				</u-grid-item>
+			</u-grid>
+			<u-toast ref="uToast" />
 		</view>
 	</view>
 </template>
@@ -29,10 +25,42 @@
 	import {
 		univerifyLogin
 	} from '@/common/univerify.js'
-
+	import {
+		urlTobase64
+	} from '@/common/utils.js'
 	export default {
 		computed: mapState(['forcedLogin', 'hasLogin', 'userName']),
+		data() {
+			return {
+				list: [{
+						name: 'photo',
+						title: '图片'
+					},
+					{
+						name: 'lock',
+						title: '锁头'
+					},
+					{
+						name: 'star',
+						title: '星星'
+					},
+					{
+						name: 'hourglass',
+						title: '沙漏'
+					},
+					{
+						name: 'home',
+						title: '首页'
+					},
+					{
+						name: 'star',
+						title: '音量'
+					},
+				],
+			}
+		},
 		onLoad() {
+			this.initWxlogin()
 			const loginType = uni.getStorageSync('login_type')
 			if (loginType === 'local') {
 				this.login(uni.getStorageSync('username'))
@@ -76,6 +104,38 @@
 		},
 		methods: {
 			...mapMutations(['login']),
+			initWxlogin() {
+				const that = this
+				uni.getProvider({
+					service: 'oauth',
+					success: function(res) {
+						console.log(res.provider);
+						//支持微信、qq和微博等
+						if (~res.provider.indexOf('weixin')) {
+							uni.login({
+								provider: 'weixin',
+								success: function(loginRes) {
+									console.log("App微信获取用户信息成功", loginRes);
+									uni.getUserInfo({
+										provider:res.provider,
+										success:(userInfo)=>{
+											console.log("AppuserInfo", userInfo);
+										}
+									})
+									// that.getApploginData(loginRes)  //请求登录接口方法
+								},
+								fail: function(res) {
+									console.log("App微信获取用户信息失败", res);
+								}
+							})
+				 	}
+					}
+				});
+			},
+			click(name) {
+				this.$refs.uToast.success(`点击了第${name}个`)
+			},
+			urlTobase64,
 			guideToLogin() {
 				uni.showModal({
 					title: '未登录',
@@ -110,25 +170,32 @@
 	}
 </script>
 
-<style>
-	.hello {
-		display: flex;
-		flex: 1;
-		flex-direction: column;
+<style lang="scss">
+	.topNav {
+		background-size: 100% 100%;
+		height: 200px;
+		line-height: 200px;
+
+		.title {
+			font-size: 64rpx;
+			font-weight: bold;
+			padding-left: 20rpx;
+			color: #fff;
+			text-shadow: 3px 4px 5px #3c3cc1;
+			font-style: italic;
+		}
 	}
 
-	.title {
-		color: #8f8f94;
-		margin-top: 25px;
-	}
+	.navContianer {
+		padding: 10rpx 0 20rpx;
 
-	.ul {
-		font-size: 15px;
-		color: #8f8f94;
-		margin-top: 25px;
-	}
-
-	.ul>view {
-		line-height: 25px;
+		.grid-text {
+			font-size: 25rpx;
+			color: #909399;
+			padding: 10rpx 0 20rpx 0rpx;
+			/* #ifndef APP-PLUS */
+			box-sizing: border-box;
+			/* #endif */
+		}
 	}
 </style>
